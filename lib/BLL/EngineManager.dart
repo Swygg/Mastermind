@@ -7,7 +7,7 @@ import 'package:mastermind/BO/Token.dart';
 
 class EngineManager {
   static EngineManager _instance;
-  static const int _nbMaxTry = 10;
+  static const int _nbMaxTry = 12;
 
   Combination _combination;
   List<Result> _results;
