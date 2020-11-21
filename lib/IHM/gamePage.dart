@@ -214,30 +214,67 @@ class _GamePageState extends State<GamePage> {
     final double _widthPossibilities = 20.0;
     final double _heihgtPossibilities = 20.0;
     var colors = ColorsManager.getColors();
-    for (int i = lastResults.length - 1; i > 0; i--) {
+    for (int i = 11; i >= 0; i--) {
       var r = Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Attempt $i - "),
+          Text("Attempt ${i + 1} - "),
         ],
       );
-      for (var indexToken = 0;
-          indexToken < engine.getCombinationLength();
-          indexToken++) {
+
+      if (i >= lastResults.length) {
         r.children.add(
           Image.asset(
-            'assets/pictures/${colors[lastResults[i].combination[indexToken]]}.png',
+            'assets/pictures/Unknown.png',
             fit: BoxFit.cover,
             width: _widthPossibilities,
             height: _heihgtPossibilities,
           ),
         );
-        r.children.add(Text(" "));
+        r.children.add(
+          Image.asset(
+            'assets/pictures/Unknown.png',
+            fit: BoxFit.cover,
+            width: _widthPossibilities,
+            height: _heihgtPossibilities,
+          ),
+        );
+        r.children.add(
+          Image.asset(
+            'assets/pictures/Unknown.png',
+            fit: BoxFit.cover,
+            width: _widthPossibilities,
+            height: _heihgtPossibilities,
+          ),
+        );
+        r.children.add(
+          Image.asset(
+            'assets/pictures/Unknown.png',
+            fit: BoxFit.cover,
+            width: _widthPossibilities,
+            height: _heihgtPossibilities,
+          ),
+        );
+      } else {
+        for (var indexToken = 0;
+            indexToken < engine.getCombinationLength();
+            indexToken++) {
+          r.children.add(
+            Image.asset(
+              'assets/pictures/${colors[lastResults[i].combination[indexToken]]}.png',
+              fit: BoxFit.cover,
+              width: _widthPossibilities,
+              height: _heihgtPossibilities,
+            ),
+          );
+          r.children.add(Text(" "));
+        }
+        r.children
+            .add(Text("OK : ${lastResults[i].result.nbTokensInRightPlace}"));
+        r.children.add(Text(" - "));
+        r.children
+            .add(Text("NOK : ${lastResults[i].result.nbTokensInBadPlace}"));
       }
-      r.children
-          .add(Text("OK : ${lastResults[i].result.nbTokensInRightPlace}"));
-      r.children.add(Text(" - "));
-      r.children.add(Text("NOK : ${lastResults[i].result.nbTokensInBadPlace}"));
       col.children.add(r);
     }
 
@@ -281,25 +318,6 @@ class _GamePageState extends State<GamePage> {
           return AlertDialog(
             title: Text("Failed"),
             content: Text("Sorry, you lose"),
-            actions: <Widget>[
-              FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Close"))
-            ],
-          );
-        });
-  }
-
-   void test(String s) {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("test"),
-            content: Text("$s"),
             actions: <Widget>[
               FlatButton(
                   onPressed: () {
