@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class OptionsPage extends StatefulWidget {
-  OptionsPage({Key key, this.title}) : super(key: key);
+class ScoresPage extends StatefulWidget {
+  ScoresPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _OptionsPageState createState() => _OptionsPageState();
+  _ScoresPageState createState() => _ScoresPageState();
 }
 
-class _OptionsPageState extends State<OptionsPage> {
+class _ScoresPageState extends State<ScoresPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
