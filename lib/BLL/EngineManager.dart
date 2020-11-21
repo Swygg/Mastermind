@@ -66,7 +66,7 @@ class EngineManager {
     EResult eResult;
     if (nbInGoodPlace == tempoCombination.length) {
       eResult = EResult.PlayerWin;
-    } else if (_results.length + 1 > _nbMaxTry) {
+    } else if (_results.length + 1 > (_nbMaxTry - 1)) {
       eResult = EResult.PlayerLose;
     } else {
       eResult = EResult.PlayerCanContinues;

@@ -14,6 +14,8 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   EngineManager engine;
   bool _cheatIsOn = false;
+  bool _showGoodAnswer = false;
+   var colors = ColorsManager.getColors();
 
   List<int> _actualProposal = [];
 
@@ -43,18 +45,7 @@ class _GamePageState extends State<GamePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 //Show token to guess
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Image.asset("assets/pictures/Unknown.png"),
-                    Image.asset("assets/pictures/Unknown.png"),
-                    Image.asset("assets/pictures/Unknown.png"),
-                    Image.asset("assets/pictures/Unknown.png"),
-                    Text(_cheatIsOn
-                        ? "${engine.getCombination()[0]}-${engine.getCombination()[1]}-${engine.getCombination()[2]}-${engine.getCombination()[3]}"
-                        : ""),
-                  ],
-                ),
+                showAnswer(),
                 Divider(),
                 //Show previous answers
                 showPreviousAnswers(),
@@ -125,7 +116,7 @@ class _GamePageState extends State<GamePage> {
       );
     }
     for (int i = 0; i < 4 - _actualProposal.length; i++) {
-       r.children.add(
+      r.children.add(
         Image.asset(
           'assets/pictures/Unknown.png',
           fit: BoxFit.cover,
@@ -156,12 +147,40 @@ class _GamePageState extends State<GamePage> {
         showVictoryMessage();
         break;
       case EResult.PlayerLose:
+        _showGoodAnswer = true;
         showFailedMessage();
         break;
       default:
         break;
     }
     proposalClear();
+  }
+
+  Widget showAnswer() {
+    if (!_showGoodAnswer) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image.asset("assets/pictures/Unknown.png"),
+          Image.asset("assets/pictures/Unknown.png"),
+          Image.asset("assets/pictures/Unknown.png"),
+          Image.asset("assets/pictures/Unknown.png"),
+          Text(_cheatIsOn
+              ? "${engine.getCombination()[0]}-${engine.getCombination()[1]}-${engine.getCombination()[2]}-${engine.getCombination()[3]}"
+              : ""),
+        ],
+      );
+    } else {
+      var r = Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [],
+      );
+      for(int i=0; i< engine.getCombination().length; i++)
+      {
+        r.children.add(Image.asset("assets/pictures/${colors[engine.getCombination()[i]]}.png"));
+      }
+      return r;
+    }
   }
 
   Widget showPossibilities() {
@@ -228,7 +247,6 @@ class _GamePageState extends State<GamePage> {
     final double _heihgtPossibilities = 20.0;
     const double _topMarginSize = 1;
 
-    var colors = ColorsManager.getColors();
     for (int i = 11; i >= 0; i--) {
       var r = Row(
         mainAxisAlignment: MainAxisAlignment.center,
