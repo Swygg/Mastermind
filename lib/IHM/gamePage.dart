@@ -124,6 +124,16 @@ class _GamePageState extends State<GamePage> {
         ),
       );
     }
+    for (int i = 0; i < 4 - _actualProposal.length; i++) {
+       r.children.add(
+        Image.asset(
+          'assets/pictures/Unknown.png',
+          fit: BoxFit.cover,
+          width: _widthPossibilities,
+          height: _heihgtPossibilities,
+        ),
+      );
+    }
     return r;
   }
 
