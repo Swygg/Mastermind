@@ -43,12 +43,13 @@ class _GamePageState extends State<GamePage> {
         body: SingleChildScrollView(
           child: Center(
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, children: getWidgets()),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _getWidgets()),
           ),
         ));
   }
 
-  List<Widget> getWidgets() {
+  List<Widget> _getWidgets() {
     var widgets = List<Widget>();
     if (engine != null) {
       //Show token to guess
@@ -85,10 +86,8 @@ class _GamePageState extends State<GamePage> {
       //Show  possibilities
       widgets.add(Text("Please make your choice : "));
       widgets.add(_showPossibilities());
-    }
-    else
-    {
-       widgets.add(Text("Loading..."));
+    } else {
+      widgets.add(Text("Loading..."));
     }
     return widgets;
   }
@@ -201,17 +200,22 @@ class _GamePageState extends State<GamePage> {
     final double _heihgtPossibilities = 50.0;
 
     var colors = new Map<int, String>();
-    int a = 0;
+    int tempo = 0;
     for (var key in _options.getColors()) {
-      colors[a] = key;
-      a++;
+      colors[tempo] = key;
+      tempo++;
+    }
+
+    int iNbColorsOnFirstLine = 6;
+    if (colors.length > 6) {
+      iNbColorsOnFirstLine = (colors.length / 2).round();
     }
 
     var row1 = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [],
     );
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < iNbColorsOnFirstLine; i++) {
       row1.children.add(
         GestureDetector(
           onTap: () {
@@ -231,7 +235,7 @@ class _GamePageState extends State<GamePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [],
     );
-    for (var i = 6; i < colors.length; i++) {
+    for (var i = iNbColorsOnFirstLine; i < colors.length; i++) {
       row2.children.add(
         GestureDetector(
           onTap: () {
