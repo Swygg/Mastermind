@@ -11,10 +11,15 @@ class EngineManager {
   static const int _nbMaxTry = 12;
 
   Combination _combination;
+  DateTime _start;
+  DateTime _end;
   List<AttemptAndResult> _results;
   Options _options;
 
   EngineManager._();
+
+  DateTime get start => _start;
+  DateTime get end => _end;
 
   static EngineManager getInstance() {
     if (_instance == null) {
@@ -34,8 +39,7 @@ class EngineManager {
       if (_options.allowRepetitivColor || !tempo.contains(randomNumber)) {
         tempo.add(randomNumber);
         _combination.addToken(Token(randomNumber));
-      }else
-      {
+      } else {
         i--;
       }
     }
@@ -43,6 +47,10 @@ class EngineManager {
   }
 
   Result compare(List<int> combination) {
+    if (_results.length == 0) {
+      _start = DateTime.now();
+    }
+
     var tempoRealCombination = _combination.getOnlyIntValue();
     var tempoCombination = [];
     for (int i = 0; i < combination.length; i++) {
@@ -81,7 +89,12 @@ class EngineManager {
     }
 
     var result = Result(eResult, nbInGoodPlace, nbInBadPlace);
+    if(result.eResult == EResult.PlayerWin)
+    {
+      _end = DateTime.now();
+    }
     _results.add(AttemptAndResult(combination, result));
+
     return result;
   }
 

@@ -104,14 +104,14 @@ class _OptionsPageState extends State<OptionsPage> {
   }
 
   void _loadOptions() async {
-    _options = await _dataManager.loadValues();
+    _options = await _dataManager.loadDataOptions();
 
     setState(() {});
   }
 
   void _saveOptions() {
     if (_isButtonClickable()) {
-      _dataManager.saveValues(_options);
+      _dataManager.saveDataOptions(_options);
       Navigator.of(context).pop();
     } else {
       _showErrorDialog();

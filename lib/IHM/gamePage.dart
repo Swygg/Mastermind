@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mastermind/BLL/EngineManager.dart';
+import 'package:mastermind/BLL/ScoresManager.dart';
 import 'package:mastermind/BO/EResult.dart';
 import 'package:mastermind/BO/Options.dart';
+import 'package:mastermind/BO/Score.dart';
 import 'package:mastermind/Data/DataManager.dart';
 
 class GamePage extends StatefulWidget {
@@ -106,7 +108,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void _firstStart() async {
-    _dataManager.loadValues().then((value) => {
+    _dataManager.loadDataOptions().then((value) => {
           _options = value,
           engine = EngineManager.getInstance(),
           _startNewGame(),
@@ -161,6 +163,7 @@ class _GamePageState extends State<GamePage> {
     switch (result.eResult) {
       case EResult.PlayerWin:
         _showVictoryMessage();
+        _maybeAddScore();
         break;
       case EResult.PlayerLose:
         _showGoodAnswer = true;
@@ -364,5 +367,20 @@ class _GamePageState extends State<GamePage> {
             ],
           );
         });
+  }
+
+  void _maybeAddScore() {
+    ScoresManager scoresManager = ScoresManager.getInstance();
+
+    var difference = engine.end.difference(engine.start);
+    var totalSeconds = difference.inSeconds;
+    var minutes = (totalSeconds / 60).round();
+    var seconds = totalSeconds % 60;
+    var formatDate = engine.end.day.toString() + "/" + engine.end.month.toString() + "/" +engine.end.year.toString();
+
+    Score score = Score(engine.getLastAttemptsAndResults().length, seconds,
+        minutes, formatDate);
+
+        scoresManager.addNewScore(score);
   }
 }
