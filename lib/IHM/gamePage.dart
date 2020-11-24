@@ -20,6 +20,13 @@ class _GamePageState extends State<GamePage> {
   Options _options;
   List<int> _actualProposal = [];
 
+  final double _widthPossibilities = 50.0;
+  final double _heihgtPossibilities = 50.0;
+  final double _widthProposal = 40.0;
+  final double _heihgtProposal = 40.0;
+  final double _widthPreviousAnswers = 20.0;
+  final double _heightPreviousAnswer = 20.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,9 +115,6 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget _showActuelProposal() {
-    final double _widthPossibilities = 40.0;
-    final double _heihgtPossibilities = 40.0;
-
     var r = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -122,8 +126,8 @@ class _GamePageState extends State<GamePage> {
         Image.asset(
           'assets/pictures/${_options.getColors()[_actualProposal[i]]}.png',
           fit: BoxFit.cover,
-          width: _widthPossibilities,
-          height: _heihgtPossibilities,
+          width: _widthProposal,
+          height: _heihgtProposal,
         ),
       );
     }
@@ -132,8 +136,8 @@ class _GamePageState extends State<GamePage> {
         Image.asset(
           'assets/pictures/Unknown.png',
           fit: BoxFit.cover,
-          width: _widthPossibilities,
-          height: _heihgtPossibilities,
+          width: _widthProposal,
+          height: _heihgtProposal,
         ),
       );
     }
@@ -196,9 +200,6 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget _showPossibilities() {
-    final double _widthPossibilities = 50.0;
-    final double _heihgtPossibilities = 50.0;
-
     var colors = new Map<int, String>();
     int tempo = 0;
     for (var key in _options.getColors()) {
@@ -268,8 +269,6 @@ class _GamePageState extends State<GamePage> {
 
     var lastResults = engine.getLastAttemptsAndResults();
     if (lastResults != null) {
-      final double _widthPossibilities = 20.0;
-      final double _heihgtPossibilities = 20.0;
       const double _topMarginSize = 1;
 
       for (int i = 11; i >= 0; i--) {
@@ -286,8 +285,8 @@ class _GamePageState extends State<GamePage> {
               Image.asset(
                 'assets/pictures/Unknown.png',
                 fit: BoxFit.cover,
-                width: _widthPossibilities,
-                height: _heihgtPossibilities,
+                width: _widthPreviousAnswers,
+                height: _heightPreviousAnswer,
               ),
             );
             r.children.add(Text(" "));
@@ -300,8 +299,8 @@ class _GamePageState extends State<GamePage> {
               Image.asset(
                 'assets/pictures/${_options.getColors()[lastResults[i].combination[indexToken]]}.png',
                 fit: BoxFit.cover,
-                width: _widthPossibilities,
-                height: _heihgtPossibilities,
+                width: _widthPreviousAnswers,
+                height: _heightPreviousAnswer,
               ),
             );
             r.children.add(Text(" "));
