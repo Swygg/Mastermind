@@ -387,7 +387,11 @@ class _GamePageState extends State<GamePage> {
         "/" +
         engine.end.month.toString() +
         "/" +
-        engine.end.year.toString();
+        engine.end.year.toString() +
+        " "+
+        engine.end.hour.toString().padLeft(2, '0') +
+        ":"+
+        engine.end.minute.toString().padLeft(2, '0');
 
     Score score = Score(engine.getLastAttemptsAndResults().length, seconds,
         minutes, formatDate);
