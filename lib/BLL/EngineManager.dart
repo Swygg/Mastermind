@@ -72,8 +72,9 @@ class EngineManager {
           if (tempoRealCombination[index2] != -1 &&
               tempoRealCombination[index2] == tempoCombination[index]) {
             nbInBadPlace++;
-            tempoRealCombination[index] = -1;
+            tempoRealCombination[index2] = -1;
             tempoCombination[index] = -1;
+            break;
           }
         }
       }
