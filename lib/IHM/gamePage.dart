@@ -18,6 +18,7 @@ class _GamePageState extends State<GamePage> {
   EngineManager engine;
   bool _cheatIsOn = false;
   bool _showGoodAnswer = false;
+  bool _winOrLose = false;
   final DataManager _dataManager = DataManager.getInstance();
   Options _options;
   List<int> _actualProposal = [];
@@ -70,7 +71,7 @@ class _GamePageState extends State<GamePage> {
       widgets.add(
         Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
           RaisedButton(
-            onPressed: _proposalClear,
+            onPressed: !_winOrLose ? _proposalClear : null,
             child: Text(
               'Clear',
               style: TextStyle(color: Colors.white),
@@ -79,7 +80,8 @@ class _GamePageState extends State<GamePage> {
             elevation: 8,
           ),
           RaisedButton(
-            onPressed: _actualProposal.length == engine.getCombinationLength()
+            onPressed: (!_winOrLose &&
+                    _actualProposal.length == engine.getCombinationLength())
                 ? _proposalAccept
                 : null,
             child: Text(
@@ -162,10 +164,13 @@ class _GamePageState extends State<GamePage> {
     var result = engine.compare(_actualProposal);
     switch (result.eResult) {
       case EResult.PlayerWin:
+        _showGoodAnswer = true;
+        _winOrLose = true;
         _showVictoryMessage();
         _maybeAddScore();
         break;
       case EResult.PlayerLose:
+        _winOrLose = true;
         _showGoodAnswer = true;
         _showFailedMessage();
         break;
@@ -322,6 +327,8 @@ class _GamePageState extends State<GamePage> {
   }
 
   void _startNewGame() {
+    _winOrLose = false;
+    _showGoodAnswer = false;
     engine.generateNewCombination(_options);
     _proposalClear();
   }
@@ -376,11 +383,15 @@ class _GamePageState extends State<GamePage> {
     var totalSeconds = difference.inSeconds;
     var minutes = (totalSeconds / 60).round();
     var seconds = totalSeconds % 60;
-    var formatDate = engine.end.day.toString() + "/" + engine.end.month.toString() + "/" +engine.end.year.toString();
+    var formatDate = engine.end.day.toString() +
+        "/" +
+        engine.end.month.toString() +
+        "/" +
+        engine.end.year.toString();
 
     Score score = Score(engine.getLastAttemptsAndResults().length, seconds,
         minutes, formatDate);
 
-        scoresManager.addNewScore(score);
+    scoresManager.addNewScore(score);
   }
 }
