@@ -1,11 +1,10 @@
 import 'package:mastermind/BO/AttemptAndResult.dart';
 import 'package:mastermind/BO/Combination.dart';
 import 'package:mastermind/BO/EResult.dart';
+import 'package:mastermind/BO/Options.dart';
 import 'package:mastermind/BO/Result.dart';
 import 'dart:math';
-
 import 'package:mastermind/BO/Token.dart';
-import 'package:mastermind/Tools/ColorsManager.dart';
 
 class EngineManager {
   static EngineManager _instance;
@@ -13,23 +12,32 @@ class EngineManager {
 
   Combination _combination;
   List<AttemptAndResult> _results;
+  Options _options;
 
-  // ignore: unused_element
-  _engineManager() {}
+  EngineManager._();
 
   static EngineManager getInstance() {
     if (_instance == null) {
-      _instance = new EngineManager();
+      _instance = EngineManager._();
     }
     return _instance;
   }
 
-  void generateNewCombination({int combinationLength = 4}) {
+  void generateNewCombination(Options options, {int combinationLength = 4}) {
+    if (options == null) options = Options();
+    _options = options;
     var random = new Random();
+    var tempo = List<int>();
     _combination = Combination();
     for (int i = 0; i < combinationLength; i++) {
-      var randomNumber = random.nextInt(ColorsManager.getColors().length);
-      _combination.addToken(Token(randomNumber));
+      var randomNumber = random.nextInt(_options.getColors().length);
+      if (_options.allowRepetitivColor || !tempo.contains(randomNumber)) {
+        tempo.add(randomNumber);
+        _combination.addToken(Token(randomNumber));
+      }else
+      {
+        i--;
+      }
     }
     _results = List<AttemptAndResult>();
   }
@@ -78,6 +86,7 @@ class EngineManager {
   }
 
   List<AttemptAndResult> getLastAttemptsAndResults() {
+    if (_results == null) _results = new List<AttemptAndResult>();
     return _results;
   }
 

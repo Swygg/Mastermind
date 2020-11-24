@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mastermind/BLL/EngineManager.dart';
 import 'package:mastermind/BO/EResult.dart';
-import 'package:mastermind/Tools/ColorsManager.dart';
+import 'package:mastermind/BO/Options.dart';
+import 'package:mastermind/Data/DataManager.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({Key key, this.title}) : super(key: key);
@@ -15,8 +16,8 @@ class _GamePageState extends State<GamePage> {
   EngineManager engine;
   bool _cheatIsOn = false;
   bool _showGoodAnswer = false;
-   var colors = ColorsManager.getColors();
-
+  final DataManager _dataManager = DataManager.getInstance();
+  Options _options;
   List<int> _actualProposal = [];
 
   @override
@@ -27,13 +28,13 @@ class _GamePageState extends State<GamePage> {
           actions: [
             IconButton(
               icon: Icon(Icons.add),
-              onPressed: startNewGame,
+              onPressed: _startNewGame,
               color: Colors.white,
               iconSize: 30,
             ),
             IconButton(
               icon: Icon(Icons.panorama_fish_eye),
-              onPressed: changeCheat,
+              onPressed: _changeCheat,
               color: Colors.white,
               iconSize: 30,
             ),
@@ -42,60 +43,72 @@ class _GamePageState extends State<GamePage> {
         body: SingleChildScrollView(
           child: Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                //Show token to guess
-                showAnswer(),
-                Divider(),
-                //Show previous answers
-                showPreviousAnswers(),
-                Divider(),
-                //Show our actual proposal
-                showActuelProposal(),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      RaisedButton(
-                        onPressed: proposalClear,
-                        child: Text(
-                          'Clear',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        color: Colors.red,
-                        elevation: 8,
-                      ),
-                      RaisedButton(
-                        onPressed: _actualProposal.length ==
-                                engine.getCombinationLength()
-                            ? proposalAccept
-                            : null,
-                        child: Text(
-                          'Accept',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        color: Colors.blue,
-                        elevation: 8,
-                      ),
-                    ]),
-                Divider(),
-                //Show  possibilities
-                Text("Please make your choice : "),
-                showPossibilities(),
-              ],
-            ),
+                mainAxisAlignment: MainAxisAlignment.center, children: getWidgets()),
           ),
         ));
+  }
+
+  List<Widget> getWidgets() {
+    var widgets = List<Widget>();
+    if (engine != null) {
+      //Show token to guess
+      widgets.add(_showAnswer());
+      widgets.add(Divider());
+      widgets.add(_showPreviousAnswers());
+      widgets.add(Divider());
+      widgets.add(_showActuelProposal());
+      widgets.add(
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          RaisedButton(
+            onPressed: _proposalClear,
+            child: Text(
+              'Clear',
+              style: TextStyle(color: Colors.white),
+            ),
+            color: Colors.red,
+            elevation: 8,
+          ),
+          RaisedButton(
+            onPressed: _actualProposal.length == engine.getCombinationLength()
+                ? _proposalAccept
+                : null,
+            child: Text(
+              'Accept',
+              style: TextStyle(color: Colors.white),
+            ),
+            color: Colors.blue,
+            elevation: 8,
+          ),
+        ]),
+      );
+      widgets.add(Divider());
+      //Show  possibilities
+      widgets.add(Text("Please make your choice : "));
+      widgets.add(_showPossibilities());
+    }
+    else
+    {
+       widgets.add(Text("Loading..."));
+    }
+    return widgets;
   }
 
   @override
   void initState() {
     super.initState();
-    engine = EngineManager.getInstance();
-    engine.generateNewCombination();
+    _firstStart();
   }
 
-  Widget showActuelProposal() {
-    var colors = ColorsManager.getColors();
+  void _firstStart() async {
+    _dataManager.loadValues().then((value) => {
+          _options = value,
+          engine = EngineManager.getInstance(),
+          _startNewGame(),
+          setState(() {})
+        });
+  }
+
+  Widget _showActuelProposal() {
     final double _widthPossibilities = 40.0;
     final double _heihgtPossibilities = 40.0;
 
@@ -108,7 +121,7 @@ class _GamePageState extends State<GamePage> {
     for (int i = 0; i < _actualProposal.length; i++) {
       r.children.add(
         Image.asset(
-          'assets/pictures/${colors[_actualProposal[i]]}.png',
+          'assets/pictures/${_options.getColors()[_actualProposal[i]]}.png',
           fit: BoxFit.cover,
           width: _widthPossibilities,
           height: _heihgtPossibilities,
@@ -128,35 +141,35 @@ class _GamePageState extends State<GamePage> {
     return r;
   }
 
-  void proposalAddProposal(int value) {
+  void _proposalAddProposal(int value) {
     if (_actualProposal.length < engine.getCombinationLength()) {
       _actualProposal.add(value);
     }
     setState(() {});
   }
 
-  void proposalClear() {
+  void _proposalClear() {
     _actualProposal = List<int>();
     setState(() {});
   }
 
-  void proposalAccept() {
+  void _proposalAccept() {
     var result = engine.compare(_actualProposal);
     switch (result.eResult) {
       case EResult.PlayerWin:
-        showVictoryMessage();
+        _showVictoryMessage();
         break;
       case EResult.PlayerLose:
         _showGoodAnswer = true;
-        showFailedMessage();
+        _showFailedMessage();
         break;
       default:
         break;
     }
-    proposalClear();
+    _proposalClear();
   }
 
-  Widget showAnswer() {
+  Widget _showAnswer() {
     if (!_showGoodAnswer) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -175,18 +188,25 @@ class _GamePageState extends State<GamePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [],
       );
-      for(int i=0; i< engine.getCombination().length; i++)
-      {
-        r.children.add(Image.asset("assets/pictures/${colors[engine.getCombination()[i]]}.png"));
+      for (int i = 0; i < engine.getCombination().length; i++) {
+        r.children.add(Image.asset(
+            "assets/pictures/${_options.getColors()[engine.getCombination()[i]]}.png"));
       }
       return r;
     }
   }
 
-  Widget showPossibilities() {
+  Widget _showPossibilities() {
     final double _widthPossibilities = 50.0;
     final double _heihgtPossibilities = 50.0;
-    var colors = ColorsManager.getColors();
+
+    var colors = new Map<int, String>();
+    int a = 0;
+    for (var key in _options.getColors()) {
+      colors[a] = key;
+      a++;
+    }
+
     var row1 = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [],
@@ -195,7 +215,7 @@ class _GamePageState extends State<GamePage> {
       row1.children.add(
         GestureDetector(
           onTap: () {
-            proposalAddProposal(i);
+            _proposalAddProposal(i);
           },
           child: Image.asset(
             'assets/pictures/${colors[i]}.png',
@@ -211,11 +231,11 @@ class _GamePageState extends State<GamePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [],
     );
-    for (var i = 6; i < 12; i++) {
+    for (var i = 6; i < colors.length; i++) {
       row2.children.add(
         GestureDetector(
           onTap: () {
-            proposalAddProposal(i);
+            _proposalAddProposal(i);
           },
           child: Image.asset(
             'assets/pictures/${colors[i]}.png',
@@ -236,75 +256,76 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  Widget showPreviousAnswers() {
+  Widget _showPreviousAnswers() {
     var col = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [],
     );
 
     var lastResults = engine.getLastAttemptsAndResults();
-    final double _widthPossibilities = 20.0;
-    final double _heihgtPossibilities = 20.0;
-    const double _topMarginSize = 1;
+    if (lastResults != null) {
+      final double _widthPossibilities = 20.0;
+      final double _heihgtPossibilities = 20.0;
+      const double _topMarginSize = 1;
 
-    for (int i = 11; i >= 0; i--) {
-      var r = Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("Attempt ${(i + 1).toString().padLeft(2, '0')} - "),
-        ],
-      );
+      for (int i = 11; i >= 0; i--) {
+        var r = Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Attempt ${(i + 1).toString().padLeft(2, '0')} - "),
+          ],
+        );
 
-      if (i >= lastResults.length) {
-        for (int j = 0; j < 4; j++) {
-          r.children.add(
-            Image.asset(
-              'assets/pictures/Unknown.png',
-              fit: BoxFit.cover,
-              width: _widthPossibilities,
-              height: _heihgtPossibilities,
-            ),
-          );
-          r.children.add(Text(" "));
+        if (i >= lastResults.length) {
+          for (int j = 0; j < 4; j++) {
+            r.children.add(
+              Image.asset(
+                'assets/pictures/Unknown.png',
+                fit: BoxFit.cover,
+                width: _widthPossibilities,
+                height: _heihgtPossibilities,
+              ),
+            );
+            r.children.add(Text(" "));
+          }
+        } else {
+          for (var indexToken = 0;
+              indexToken < engine.getCombinationLength();
+              indexToken++) {
+            r.children.add(
+              Image.asset(
+                'assets/pictures/${_options.getColors()[lastResults[i].combination[indexToken]]}.png',
+                fit: BoxFit.cover,
+                width: _widthPossibilities,
+                height: _heihgtPossibilities,
+              ),
+            );
+            r.children.add(Text(" "));
+          }
+          r.children
+              .add(Text("OK : ${lastResults[i].result.nbTokensInRightPlace}"));
+          r.children.add(Text(" - "));
+          r.children
+              .add(Text("NOK : ${lastResults[i].result.nbTokensInBadPlace}"));
         }
-      } else {
-        for (var indexToken = 0;
-            indexToken < engine.getCombinationLength();
-            indexToken++) {
-          r.children.add(
-            Image.asset(
-              'assets/pictures/${colors[lastResults[i].combination[indexToken]]}.png',
-              fit: BoxFit.cover,
-              width: _widthPossibilities,
-              height: _heihgtPossibilities,
-            ),
-          );
-          r.children.add(Text(" "));
-        }
-        r.children
-            .add(Text("OK : ${lastResults[i].result.nbTokensInRightPlace}"));
-        r.children.add(Text(" - "));
-        r.children
-            .add(Text("NOK : ${lastResults[i].result.nbTokensInBadPlace}"));
+        col.children.add(Container(
+            margin: const EdgeInsets.only(top: _topMarginSize), child: r));
       }
-      col.children.add(Container(
-          margin: const EdgeInsets.only(top: _topMarginSize), child: r));
     }
-
     return col;
   }
 
-  void startNewGame() {
-    engine.generateNewCombination();
-    proposalClear();
+  void _startNewGame() {
+    engine.generateNewCombination(_options);
+    _proposalClear();
   }
 
-  void changeCheat() {
+  void _changeCheat() {
     _cheatIsOn = !_cheatIsOn;
     setState(() {});
   }
 
-  void showVictoryMessage() {
+  void _showVictoryMessage() {
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -323,7 +344,7 @@ class _GamePageState extends State<GamePage> {
         });
   }
 
-  void showFailedMessage() {
+  void _showFailedMessage() {
     showDialog(
         context: context,
         barrierDismissible: false,

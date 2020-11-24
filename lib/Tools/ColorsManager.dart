@@ -1,3 +1,4 @@
+/*
 class ColorsManager
 {
   static List<String> getColors()
@@ -18,3 +19,4 @@ class ColorsManager
     ];
   }
 }
+*/
