@@ -13,12 +13,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mastermind (by Swygg)',
+      title: 'Mastermind',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MenuPage(title: 'Mastermind (by Swygg)'),
+      home: MenuPage(title: 'Mastermind'),
       routes: <String, WidgetBuilder>{
         IHMNames.ihm_GamePage_Name: (BuildContext context) => GamePage(title: 'Let''s play !'),
         IHMNames.ihm_OptionsPage_Name: (BuildContext context) => OptionsPage(title: 'Options'),
